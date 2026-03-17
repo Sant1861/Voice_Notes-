@@ -5,112 +5,128 @@
 
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       margin: 0;
+      padding: 10px;
     }
 
     .container {
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      width: 420px;
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 420px;
       text-align: center;
-      animation: fadeIn 0.6s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px);}
-      to { opacity: 1; transform: translateY(0);}
     }
 
     h2 {
-      margin-bottom: 20px;
       color: #333;
+      font-size: 22px;
     }
 
-    .buttons {
-      margin-bottom: 10px;
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     button {
-      padding: 10px 20px;
-      margin: 8px;
+      padding: 10px 18px;
       border: none;
-      border-radius: 25px;
+      border-radius: 6px;
       cursor: pointer;
       font-size: 14px;
-      font-weight: bold;
-      transition: all 0.3s ease;
+      min-width: 120px;
     }
 
     .start {
-      background: linear-gradient(45deg, #28a745, #34d058);
+      background: #28a745;
       color: white;
     }
 
     .stop {
-      background: linear-gradient(45deg, #dc3545, #ff6b6b);
+      background: #dc3545;
       color: white;
     }
 
     button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      opacity: 0.85;
     }
 
     textarea {
-      margin-top: 15px;
-      padding: 15px;
-      border: none;
-      border-radius: 12px;
-      min-height: 110px;
+      margin-top: 20px;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      min-height: 100px;
       width: 100%;
-      background: #f1f3f6;
+      background: #fafafa;
       resize: none;
       font-size: 14px;
-      outline: none;
-      box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
     }
 
     .wallet {
-      margin-top: 20px;
-      padding: 12px;
-      background: #f9fafc;
-      border-radius: 10px;
+      margin-top: 15px;
       font-weight: bold;
-      color: #333;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      font-size: 15px;
     }
 
     .status {
       margin-top: 10px;
       font-size: 13px;
-      padding: 6px 12px;
-      border-radius: 20px;
-      display: inline-block;
-      background: #e0e0e0;
-      color: #555;
+      color: gray;
     }
 
-    .listening {
-      background: #d4edda;
-      color: #155724;
+    /* 🔥 MOBILE (max 480px) */
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px;
+      }
+
+      h2 {
+        font-size: 18px;
+      }
+
+      button {
+        width: 100%;
+        font-size: 13px;
+      }
+
+      textarea {
+        font-size: 13px;
+        min-height: 90px;
+      }
     }
 
-    .stopped {
-      background: #f8d7da;
-      color: #721c24;
+    /* 🔥 TABLET (481px - 768px) */
+    @media (max-width: 768px) {
+      .container {
+        max-width: 90%;
+      }
+
+      textarea {
+        min-height: 110px;
+      }
     }
+
+    /* 🔥 LARGE SCREENS */
+    @media (min-width: 1024px) {
+      .container {
+        max-width: 450px;
+      }
+
+      h2 {
+        font-size: 24px;
+      }
+    }
+
   </style>
 </head>
 
@@ -119,23 +135,22 @@
 <div class="container">
   <h2>🎤 Voice Notes App</h2>
 
-  <div class="buttons">
+  <div class="btn-group">
     <button class="start" onclick="startRecording()">Start Recording</button>
     <button class="stop" onclick="stopRecording()">Stop</button>
   </div>
 
-  <textarea id="output" placeholder="Speak or type your notes here..."></textarea>
+  <textarea id="output" placeholder="Your text will appear here..."></textarea>
 
   <div class="wallet">💰 Wallet Balance: ₹100</div>
 
-  <div class="status stopped" id="status">Stopped</div>
+  <div class="status" id="status">Status: Idle</div>
 </div>
 
 <script>
 let recognition;
 let finalText = "";
 
-// START
 function startRecording() {
   finalText = "";
   document.getElementById("output").value = "";
@@ -145,9 +160,7 @@ function startRecording() {
   recognition.continuous = true;
   recognition.interimResults = true;
 
-  let status = document.getElementById("status");
-  status.innerText = "Listening...";
-  status.className = "status listening";
+  document.getElementById("status").innerText = "Status: Listening...";
 
   recognition.onresult = function(event) {
     let interimText = "";
@@ -172,16 +185,12 @@ function startRecording() {
   recognition.start();
 }
 
-// STOP
 function stopRecording() {
   if (recognition) {
     recognition.onend = null;
     recognition.stop();
+    document.getElementById("status").innerText = "Status: Stopped";
   }
-
-  let status = document.getElementById("status");
-  status.innerText = "Stopped";
-  status.className = "status stopped";
 }
 </script>
 
